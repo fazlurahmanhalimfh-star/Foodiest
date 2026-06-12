@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body class="p-5">
+    @include('navbar')
+    <button onclick="toggle_modal()" class="bg-blue-500 text-white px-4 py-2 rounded-2xl">+ Tambah Item</button>
+    <table class="table-auto w-full mt-5">
+        <thead>
+            <tr class="bg-gray-300">
+                <th class="border p-2">Nama Produk</th>
+                <th class="border p-2">Harga</th>
+                <th class="border p-2">Stok</th>
+                <th class="border p-2">Deskripsi</th>
+                <th class="border p-2">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($products as $p)
+            <tr>
+                <td class="border p-2">{{ $p->nama_produk }}</td>
+                <td class="border p-2">Rp{{ number_format($p->harga, 0, ',', '.') }}</td>
+                <td class="border p-2">{{ $p->stok }}</td>
+                <td class="border p-2">{{ $p->deskripsi }}</td>
+                <td class="border p-2 text-center justify-center gap-4">
+                    <button onclick="toggle_edit({{ $p }})" class="text-green-600 font-medium">
+                        <span class="material-icons">edit</span>
+                    </button>
+                    <button onclick="if(confirm('Yakin ingin menghapus produk ini?')) {document.getElementById('form-delete{{ $p->id }}').submit();}" class="text-red-600 font-medium">
+                        <span class="material-icons">delete</span>
+                    </button>
+                    <form id="form-delete{{ $p->id }}" action="{{ route('products.destroy', $p->id) }}" method="POST" class="hidden">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    {{-- Modal Tambah: --}}
+    <div id="modal-tambah-item" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-2xl shadow-lg w-96">
+            <h2 class="text-lg font-bold mb-5">Tambah Item Baru</h2>
+            <form action="{{route ('products.store')}}" method="post">
+                @csrf
+                <label for="menu">Nama Produk</label>
+                <input type="text" name="nama_produk" class="w-full border p-2 mb-3 rounded" required>
+
+                <label for="harga">Harga</label>
+                <input type="number" name="harga" class="w-full border p-2 mb-3 rounded" required>
+
+                <label for="stok">Stok</label>
+                <input type="number" name="stok" class="w-full border p-2 mb-3 rounded" required>
+
+                <label for="deskripsi" class="text-sm">Deskripsi</label>
+                <textarea name="deskripsi" class="w-full border p-2 mb-3 rounded" required>></textarea>
+
+                <div class="flex justify-end gap-3 mt-2">
+                    <button type="button" onclick="toggle_modal()" class="text-gray-500">Batal</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-2xl">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {{-- Modal Edit: --}}
+    <div id="modal-edit-item" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-2xl shadow-lg w-96">
+            <h2 class="text-lg font-bold mb-5">Edit Item</h2>
+            <form id="form-edit" method="post">
+                @csrf
+                @method('PUT')
+                <label for="menu">Nama Produk</label>
+                <input type="text" id="edit_nama_produk" name="nama_produk" class="w-full border p-2 mb-3 rounded" required>
+
+                <label for="harga">Harga</label>
+                <input type="number" id="edit_harga" name="harga" class="w-full border p-2 mb-3 rounded" required>
+
+                <label for="stok">Stok</label>
+                <input type="number" id="edit_stok" name="stok" class="w-full border p-2 mb-3 rounded" required>
+
+                <label for="deskripsi" class="text-sm">Deskripsi</label>
+                <textarea id="edit_deskripsi" name="deskripsi" class="w-full border p-2 mb-3 rounded" required>></textarea>
+
+                <div class="flex justify-end gap-3 mt-2">
+                    <button type="button" onclick="document.getElementById('modal-edit-item').classList.replace('flex', 'hidden')" class="text-gray-500">Batal</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-2xl">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function toggle_modal(){
+            const modal = document.getElementById('modal-tambah-item');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+        function toggle_edit(item){
+            const modal = document.getElementById('modal-edit-item');
+            //Mengatur route pada action form secara dinamis
+            document.getElementById('form-edit').action = '/products/' + item.id;
+            //Mengisi value input form dengan data item yang dipilih
+            document.getElementById('edit_nama_produk').value = item.nama_produk;
+            document.getElementById('edit_harga').value = item.harga;
+            document.getElementById('edit_stok').value = item.stok;
+            document.getElementById('edit_deskripsi').value = item.deskripsi;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    </script>
+</body>
+</html>

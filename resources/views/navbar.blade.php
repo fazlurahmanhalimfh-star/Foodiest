@@ -20,10 +20,10 @@
             </div>
         </div>
         {{-- Logout --}}
-            <form action="{{ route('logout') }}" method="post" m-0
-            onsubmit="return confirm('Yakin ingin keluar dari aplikasi Foodiest?')">
+            <form id="logout" action="{{ route('logout') }}" method="post" class="m-0">
                 @csrf
-                <button type="submit" class="text-grey-500 hover:text-red-500
+                <button type="button" onclick="confirmLogout()"
+                class="text-grey-500 hover:text-red-500
                 font-medium flex items-center gap-1 transition">
                 <span class="material-icons text-base">logout</span>    
                 Keluar
@@ -31,3 +31,25 @@
             </form>
     </div>
 </nav>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmLogout(){
+        Swal.fire({
+            title: 'Konfirmasi Logout',
+            text: 'Yakin ingin keluar dari aplikasi Foodiest?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, keluar',
+            cancelButtonText: 'Batal'
+        })
+        .then((result) => {
+            if (result.isConfirmed){
+                document.getElementById('logout').submit();
+            }
+        });
+    }
+</script>

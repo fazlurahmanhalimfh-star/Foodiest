@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProductController extends Controller
 {
@@ -84,5 +85,14 @@ class ProductController extends Controller
         $product = \App\Models\Product::findOrFail($id);
         $product->delete();
         return redirect()->route('products.index')->with('success', 'produk berhasil dihapus');
+    }
+
+    //Fungsi Download PDF
+    public function downloadPdf(){
+        //Ambil semua data tabel products
+        $products = \App\Models\product::all();
+        //Muat halaman view khusus (HTML+CSS) dan gunakan data prouducts
+        $pdf = Pdf::loadView('products.product_pdf', compact('products'));
+        return $pdf->download('Laporan Data Produk Foodiest.pdf');
     }
 }
